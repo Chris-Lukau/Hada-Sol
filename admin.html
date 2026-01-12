@@ -2,202 +2,109 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
+  <title>Login Admin | Gráfica</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Admin - Hada-Sol</title>
   <style>
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #004080;
-      color: white;
-      padding: 15px;
+      background: linear-gradient(135deg, #1f2937, #111827);
+      height: 100vh;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-    }
-    header h1 {
+      justify-content: center;
       margin: 0;
-      font-size: 20px;
     }
-    header button {
-      background: #ff5050;
-      border: none;
-      color: white;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    main {
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
-      background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    section {
-      margin-bottom: 30px;
-    }
-    h2 {
-      margin-top: 0;
-      color: #004080;
-    }
-    table {
+    .login-box {
+      background: #fff;
+      padding: 30px;
       width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 10px;
+      max-width: 360px;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
+    .login-box h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 22px;
+      color: #1f2937;
     }
-    th {
-      background: #f0f0f0;
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #374151;
     }
-    button.action {
-      margin-left: 5px;
-      padding: 5px 10px;
-      border-radius: 3px;
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
       border: none;
+      color: #fff;
+      font-size: 15px;
+      border-radius: 4px;
       cursor: pointer;
     }
-    button.edit { background: #ffa500; color: white; }
-    button.delete { background: #ff5050; color: white; }
-    button.add { background: #28a745; color: white; }
-    input[type="text"], input[type="number"] {
-      padding: 5px;
-      width: calc(100% - 12px);
-      margin-bottom: 5px;
+    button:hover {
+      background: #1d4ed8;
     }
-    footer {
-      text-align: center;
-      margin-top: 20px;
+    .note {
+      margin-top: 15px;
       font-size: 12px;
-      color: #555;
+      color: #6b7280;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-
-<header>
-  <h1>Painel Admin - Hada-Sol</h1>
-  <button onclick="logout()">Logout</button>
-</header>
-
-<main>
-  <!-- Seção Serviços -->
-  <section>
-    <h2>Serviços da Gráfica</h2>
-    <table id="servicesTable">
-      <thead>
-        <tr>
-          <th>Serviço</th>
-          <th>Preço (Kz)</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Linhas geradas pelo JS -->
-      </tbody>
-    </table>
-    <button class="add" onclick="addService()">+ Adicionar Serviço</button>
-  </section>
-
-  <!-- Seção Informações da Gráfica -->
-  <section>
-    <h2>Informações da Gráfica</h2>
-    <label>Nome:</label>
-    <input type="text" id="companyName" value="Hada-Sol Serviços Comercial S.U"><br>
-    <label>Endereço:</label>
-    <input type="text" id="companyAddress" value="Rua de Alfa 5, Cazenga-Luanda"><br>
-    <label>Telefone:</label>
-    <input type="text" id="companyPhone" value="+244 927 774 756 | +244 923 689 961"><br>
-    <label>Horário:</label>
-    <input type="text" id="companyHours" value="Seg–Sáb: 08h–17h"><br>
-    <button class="add" onclick="saveCompanyInfo()">Salvar Alterações</button>
-  </section>
-</main>
-
-<footer>
-  Sistema Hada-Sol – Protótipo
-</footer>
-
 <script>
-  // --- Funções de serviços ---
-  let services = JSON.parse(localStorage.getItem('services')) || [
-    {name: "Cartão de visita", price: 2000},
-    {name: "Banner", price: 15000}
-  ];
-
-  function renderServices() {
-    const tbody = document.querySelector('#servicesTable tbody');
-    tbody.innerHTML = '';
-    services.forEach((service, index) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${service.name}</td>
-        <td>${service.price}</td>
-        <td>
-          <button class="action edit" onclick="editService(${index})">Editar</button>
-          <button class="action delete" onclick="deleteService(${index})">Apagar</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
+  // PROTEÇÃO DO PAINEL - ETAPA 2
+  if (localStorage.getItem('auth') !== 'true') {
+    window.location.href = 'login.html';
   }
-
-  function addService() {
-    const name = prompt("Nome do serviço:");
-    if(!name) return;
-    const price = prompt("Preço (Kz):");
-    if(!price || isNaN(price)) { alert("Preço inválido"); return; }
-    services.push({name, price: Number(price)});
-    localStorage.setItem('services', JSON.stringify(services));
-    renderServices();
-  }
-
-  function editService(index) {
-    const service = services[index];
-    const name = prompt("Editar nome:", service.name);
-    if(!name) return;
-    const price = prompt("Editar preço:", service.price);
-    if(!price || isNaN(price)) { alert("Preço inválido"); return; }
-    services[index] = {name, price: Number(price)};
-    localStorage.setItem('services', JSON.stringify(services));
-    renderServices();
-  }
-
-  function deleteService(index) {
-    if(confirm("Apagar este serviço?")) {
-      services.splice(index, 1);
-      localStorage.setItem('services', JSON.stringify(services));
-      renderServices();
-    }
-  }
-
-  renderServices();
-
-  // --- Funções de informações da gráfica ---
-  function saveCompanyInfo() {
-    const info = {
-      name: document.getElementById('companyName').value,
-      address: document.getElementById('companyAddress').value,
-      phone: document.getElementById('companyPhone').value,
-      hours: document.getElementById('companyHours').value
-    };
-    localStorage.setItem('companyInfo', JSON.stringify(info));
-    alert("Informações salvas com sucesso!");
-  }
-
-  // --- Logout (simulação) ---
-  function logout() {
-    alert("Logout efetuado! Feche o navegador ou volte à página principal.");
-  }
-
 </script>
+
+<div class="login-box">
+  <h1>Área Administrativa</h1>
+  <form id="loginForm">
+    <label>Email</label>
+    <input type="email" id="email" placeholder="admin@exemplo.com" required>
+
+    <label>Senha</label>
+    <input type="password" id="password" placeholder="********" required>
+
+    <button type="submit">Entrar</button>
+  </form>
+  <script>
+    // LOGIN FAKE - ETAPA 1
+    const form = document.getElementById('loginForm');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      // credenciais temporárias
+      if (email === 'admin@hada-sol.com' && password === '123456') {
+        localStorage.setItem('auth', 'true');
+        window.location.href = 'admin.html';
+      } else {
+        alert('Email ou senha incorretos');
+      }
+    });
+  </script>
+  <div class="note">
+    Acesso restrito • Painel Admin
+  </div>
+</div>
+
 </body>
 </html>
