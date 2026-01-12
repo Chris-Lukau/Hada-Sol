@@ -2,109 +2,95 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Login Admin | Gráfica</title>
+  <title>Painel Admin | Gráfica</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body {
-      background: linear-gradient(135deg, #1f2937, #111827);
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-    }
-    .login-box {
-      background: #fff;
-      padding: 30px;
-      width: 100%;
-      max-width: 360px;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
-    .login-box h1 {
-      text-align: center;
-      margin-bottom: 25px;
-      font-size: 22px;
-      color: #1f2937;
-    }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
-      color: #374151;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #d1d5db;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #2563eb;
-      border: none;
-      color: #fff;
-      font-size: 15px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #1d4ed8;
-    }
-    .note {
-      margin-top: 15px;
-      font-size: 12px;
-      color: #6b7280;
-      text-align: center;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body { background: #f4f6f8; }
+    header { background: #1f2937; color: #fff; padding: 15px 20px; }
+    header h1 { font-size: 20px; }
+    .container { padding: 20px; max-width: 1000px; margin: auto; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .top-bar button { padding: 10px 15px; background: #2563eb; border: none; color: #fff; cursor: pointer; border-radius: 4px; }
+    .top-bar button:hover { background: #1d4ed8; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    table thead { background: #e5e7eb; }
+    table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    table th { font-size: 14px; }
+    .actions button { margin-right: 5px; padding: 6px 10px; border: none; border-radius: 3px; cursor: pointer; }
+    .edit { background: #16a34a; color: #fff; }
+    .delete { background: #dc2626; color: #fff; }
+    footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 13px; }
   </style>
 </head>
 <body>
-<script>
-  // PROTEÇÃO DO PAINEL - ETAPA 2
-  if (localStorage.getItem('auth') !== 'true') {
-    window.location.href = 'login.html';
-  }
-</script>
 
-<div class="login-box">
-  <h1>Área Administrativa</h1>
-  <form id="loginForm">
-    <label>Email</label>
-    <input type="email" id="email" placeholder="admin@exemplo.com" required>
+<header>
+  <h1>Painel Administrativo - Gráfica</h1>
+</header>
 
-    <label>Senha</label>
-    <input type="password" id="password" placeholder="********" required>
+<div class="container">
 
-    <button type="submit">Entrar</button>
-  </form>
-  <script>
-    // LOGIN FAKE - ETAPA 1
-    const form = document.getElementById('loginForm');
-
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      // credenciais temporárias
-      if (email === 'admin@hada-sol.com' && password === '123456') {
-        localStorage.setItem('auth', 'true');
-        window.location.href = 'admin.html';
-      } else {
-        alert('Email ou senha incorretos');
-      }
-    });
-  </script>
-  <div class="note">
-    Acesso restrito • Painel Admin
+  <div class="top-bar">
+    <h2>Serviços e Preços</h2>
+    <button>+ Adicionar Serviço</button>
   </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Serviço</th>
+        <th>Preço</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Impressão A4</td>
+        <td>500 Kz</td>
+        <td class="actions">
+          <button class="edit">Editar</button>
+          <button class="delete">Remover</button>
+        </td>
+      </tr>
+      <tr>
+        <td>Cartões de Visita</td>
+        <td>2.500 Kz</td>
+        <td class="actions">
+          <button class="edit">Editar</button>
+          <button class="delete">Remover</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <footer>
+    Painel Admin • Versão Inicial (Frontend)
+  </footer>
+
 </div>
+
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDYw4M_PV9H-44Tq88lMWtnSamTw2ZGw9Q",
+    authDomain: "hada-sol-admin.firebaseapp.com",
+    projectId: "hada-sol-admin",
+    appId: "1:538490730868:web:7c74dbf65c6a639aded421"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.replace('login.html');
+    }
+  });
+</script>
 
 </body>
 </html>
