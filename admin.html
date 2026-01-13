@@ -867,6 +867,14 @@
     });
     updateStats(servicesArr);
   });
+
+  function refreshServices() {
+  // apenas dispara o snapshot novamente
+  db.collection('services').orderBy('name').get()
+    .then(snapshot => console.log('Atualizado', snapshot.docs.length))
+    .catch(err => console.error(err));
+}
+
 </script>
 
 
