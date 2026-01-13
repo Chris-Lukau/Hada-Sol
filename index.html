@@ -2,126 +2,77 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
+  <title>Hada-Sol | Serviços</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hada-Sol Serviços Comerciais</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: #f9fafb;
       margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #004080;
-      color: white;
-      padding: 15px;
-      text-align: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
-    main {
-      max-width: 800px;
-      margin: 20px auto;
-      background: white;
       padding: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    section {
-      margin-bottom: 30px;
-    }
-    h2 {
-      color: #004080;
-      margin-top: 0;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background: #f0f0f0;
-    }
-    footer {
+    h1 {
       text-align: center;
-      margin-top: 20px;
-      font-size: 12px;
-      color: #555;
-      padding: 10px;
+      color: #111827;
+    }
+    .service {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+    .price {
+      color: #16a34a;
+      font-weight: bold;
     }
   </style>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<header>
-  <h1 id="companyName">Hada-Sol Serviços Comerciais</h1>
-</header>
+<h1>Serviços Hada-Sol</h1>
 
-<main>
-  <!-- Seção Informações -->
-  <section id="infoSection">
-    <h2>Informações da Gráfica</h2>
-    <p><strong>Endereço:</strong> <span id="companyAddress">Rua de Alfa 5, Cazenga-Luanda</span></p>
-    <p><strong>Telefone:</strong> <span id="companyPhone">+244 927 774 756 | +244 923 689 961</span></p>
-    <p><strong>Horário:</strong> <span id="companyHours">Seg–Sáb: 08h–17h</span></p>
-  </section>
-
-  <!-- Seção Serviços -->
-  <section id="servicesSection">
-    <h2>Serviços e Preços</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Serviço</th>
-          <th>Preço (Kz)</th>
-        </tr>
-      </thead>
-      <tbody id="servicesTable">
-        <!-- Linhas geradas pelo JS -->
-      </tbody>
-    </table>
-  </section>
-</main>
-
-<footer>
-  Hada-Sol – Todos os direitos reservados
-</footer>
+<div id="services"></div>
 
 <script>
-  // --- Puxa dados do LocalStorage (painel admin) ---
-  const defaultCompanyInfo = {
-    name: "Hada-Sol Serviços Comerciais",
-    address: "Rua de Alfa 5, Cazenga-Luanda",
-    phone: "+244 927 774 756 | +244 923 689 961",
-    hours: "Seg–Sáb: 08h–17h"
+  const firebaseConfig = {
+    apiKey: "AIzaSyDYw4M_PV9H-44Tq88lMWtnSamTw2ZGw9Q",
+    authDomain: "hada-sol-admin.firebaseapp.com",
+    projectId: "hada-sol-admin",
+    appId: "1:538490730868:web:7c74dbf65c6a639aded421"
   };
 
-  const defaultServices = [
-    {name: "Cartão de visita", price: 2000},
-    {name: "Banner", price: 15000}
-  ];
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-  const companyInfo = JSON.parse(localStorage.getItem('companyInfo')) || defaultCompanyInfo;
-  const services = JSON.parse(localStorage.getItem('services')) || defaultServices;
+  db.collection('services')
+    .where('active', '==', true)
+    .orderBy('name')
+    .onSnapshot(snapshot => {
+      const container = document.getElementById('services');
+      container.innerHTML = '';
 
-  // --- Atualiza informações da gráfica ---
-  document.getElementById('companyName').textContent = companyInfo.name;
-  document.getElementById('companyAddress').textContent = companyInfo.address;
-  document.getElementById('companyPhone').textContent = companyInfo.phone;
-  document.getElementById('companyHours').textContent = companyInfo.hours;
+      if (snapshot.empty) {
+        container.innerHTML = '<p>Nenhum serviço disponível.</p>';
+        return;
+      }
 
-  // --- Renderiza tabela de serviços ---
-  const tbody = document.getElementById('servicesTable');
-  services.forEach(service => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${service.name}</td><td>${service.price}</td>`;
-    tbody.appendChild(tr);
-  });
+      snapshot.forEach(doc => {
+        const s = doc.data();
+        container.innerHTML += `
+          <div class="service">
+            <h3>${s.name}</h3>
+            <p>${s.description || ''}</p>
+            <p class="price">${s.price} Kz</p>
+          </div>
+        `;
+      });
+    });
 </script>
 
 </body>
