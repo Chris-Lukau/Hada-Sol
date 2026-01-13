@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  
 
   <style>
     * {
@@ -743,211 +744,183 @@
       <p id="toastMessage">Serviço adicionado com sucesso.</p>
     </div>
   </div>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <!-- Firebase scripts (unchanged) -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  
-  <script>
-    // Firebase Configuration (unchanged)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDYw4M_PV9H-44Tq88lMWtnSamTw2ZGw9Q",
-      authDomain: "hada-sol-admin.firebaseapp.com",
-      projectId: "hada-sol-admin",
-      appId: "1:538490730868:web:7c74dbf65c6a639aded421"
-    };
+<script>
+  // -------------------- Firebase --------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyDYw4M_PV9H-44Tq88lMWtnSamTw2ZGw9Q",
+    authDomain: "hada-sol-admin.firebaseapp.com",
+    projectId: "hada-sol-admin",
+    appId: "1:538490730868:web:7c74dbf65c6a639aded421"
+  };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
 
-    // DOM Elements
-    const mobileToggle = document.getElementById('mobileToggle');
-    const sidebar = document.getElementById('sidebar');
+  // -------------------- Toast --------------------
+  function showToast(title, message, type='success') {
     const toast = document.getElementById('toast');
-    const toastTitle = document.getElementById('toastTitle');
-    const toastMessage = document.getElementById('toastMessage');
+    if(!toast) return;
 
-    // Toggle sidebar on mobile
-    mobileToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-    });
+    const toastTitle = toast.querySelector('.toast-title');
+    const toastMessage = toast.querySelector('.toast-message');
+    const icon = toast.querySelector('.toast-icon i');
 
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', (event) => {
-      if (window.innerWidth <= 992 && 
-          !sidebar.contains(event.target) && 
-          !mobileToggle.contains(event.target)) {
-        sidebar.classList.remove('open');
-      }
-    });
+    toast.className = 'toast show toast-' + type;
+    toastTitle.textContent = title;
+    toastMessage.textContent = message;
+    icon.className = type === 'success' ? 'fas fa-check' : 'fas fa-exclamation-triangle';
 
-    // Show toast notification
-    function showToast(title, message, type = 'success') {
-      toast.className = 'toast';
-      toast.classList.add(`toast-${type}`);
-      toast.classList.add('show');
-      
-      toastTitle.textContent = title;
-      toastMessage.textContent = message;
-      
-      // Set icon based on type
-      const icon = toast.querySelector('.toast-icon i');
-      if (type === 'success') {
-        icon.className = 'fas fa-check';
-      } else {
-        icon.className = 'fas fa-exclamation-triangle';
-      }
-      
-      // Hide after 4 seconds
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 4000);
-    }
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
 
-    // Scroll to form
-    function scrollToForm() {
-      document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
-      document.getElementById('name').focus();
-    }
+  // -------------------- Identificação da Página --------------------
+  const isAdminPage = !!document.getElementById('admin-dashboard'); // ou qualquer elemento único da página admin
 
-    // Clear form
-    function clearForm() {
-      document.getElementById('name').value = '';
-      document.getElementById('price').value = '';
-      document.getElementById('description').value = '';
-      showToast('Formulário limpo', 'Todos os campos foram limpos', 'success');
-    }
+  // -------------------- Icon Mapping --------------------
+  const iconMapping = {
+    'limpeza': 'fas fa-broom',
+    'jardim': 'fas fa-leaf',
+    'construção': 'fas fa-hammer',
+    'pintura': 'fas fa-paint-roller',
+    'elétrica': 'fas fa-bolt',
+    'hidráulica': 'fas fa-faucet',
+    'móvel': 'fas fa-couch',
+    'transporte': 'fas fa-truck-moving',
+    'default': 'fas fa-concierge-bell'
+  };
 
-    // Calculate and update stats
-    function updateStats(services) {
-      const total = services.length;
-      const active = services.filter(s => s.active).length;
-      const inactive = total - active;
-      const avgPrice = total > 0 
-        ? Math.round(services.reduce((sum, s) => sum + s.price, 0) / total) 
-        : 0;
-      
-      document.getElementById('totalServices').textContent = total;
-      document.getElementById('activeServices').textContent = active;
-      document.getElementById('inactiveServices').textContent = inactive;
-      document.getElementById('avgPrice').textContent = avgPrice.toLocaleString();
-    }
+  function getServiceIcon(name) {
+    name = name.toLowerCase();
+    for(const key in iconMapping) if(name.includes(key)) return iconMapping[key];
+    return iconMapping.default;
+  }
 
-    // Original addService function (unchanged)
+  // -------------------- Funções Admin --------------------
+  if(isAdminPage) {
+    const dbContainer = document.getElementById('services');
+    const totalServicesEl = document.getElementById('totalServices');
+    const activeServicesEl = document.getElementById('activeServices');
+    const inactiveServicesEl = document.getElementById('inactiveServices');
+    const avgPriceEl = document.getElementById('avgPrice');
+
     function addService() {
       const name = document.getElementById('name').value;
       const price = Number(document.getElementById('price').value);
       const description = document.getElementById('description').value;
 
-      if (!name || !price) {
-        showToast('Campos obrigatórios', 'Preencha nome e preço do serviço', 'error');
-        return;
-      }
+      if(!name || !price) return showToast('Campos obrigatórios', 'Preencha nome e preço', 'error');
 
       db.collection('services').add({
-        name, 
-        price, 
-        description,
-        active: true,
+        name, price, description, active: true,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        showToast('Serviço adicionado', `${name} foi adicionado com sucesso!`, 'success');
+        showToast('Serviço adicionado', `${name} adicionado com sucesso!`, 'success');
         clearForm();
-      }).catch(error => {
-        showToast('Erro ao adicionar', 'Ocorreu um erro. Tente novamente.', 'error');
-        console.error("Error adding service: ", error);
-      });
+      }).catch(err => console.error(err));
     }
 
-    // Original logout function (unchanged)
-    function logout() {
-      firebase.auth().signOut().then(() => {
-        window.location.href = 'login.html';
-      });
-    }
-
-    // Original toggleService function (unchanged)
     function toggleService(id, current) {
-      const newStatus = !current;
-      db.collection('services').doc(id).update({ 
-        active: newStatus,
+      db.collection('services').doc(id).update({
+        active: !current,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        const statusText = newStatus ? 'ativado' : 'desativado';
-        showToast('Status alterado', `Serviço ${statusText} com sucesso`, 'success');
-      }).catch(error => {
-        showToast('Erro ao alterar', 'Não foi possível alterar o status', 'error');
-        console.error("Error toggling service: ", error);
-      });
+        showToast('Status alterado', `Serviço ${!current ? 'ativado' : 'desativado'}`, 'success');
+      }).catch(err => console.error(err));
     }
 
-    // Original deleteService function (unchanged)
     function deleteService(id) {
-      if (confirm('Tem certeza que deseja apagar este serviço? Esta ação não pode ser desfeita.')) {
-        db.collection('services').doc(id).delete().then(() => {
-          showToast('Serviço removido', 'O serviço foi apagado permanentemente', 'success');
-        }).catch(error => {
-          showToast('Erro ao remover', 'Não foi possível apagar o serviço', 'error');
-          console.error("Error deleting service: ", error);
-        });
-      }
+      if(!confirm('Deseja apagar este serviço?')) return;
+      db.collection('services').doc(id).delete()
+        .then(() => showToast('Removido', 'Serviço apagado', 'success'))
+        .catch(err => console.error(err));
     }
 
-    // Refresh services manually
-    function refreshServices() {
-      showToast('Atualizando...', 'Lista de serviços atualizada', 'success');
+    function clearForm() {
+      ['name','price','description'].forEach(id => document.getElementById(id).value = '');
+      showToast('Formulário limpo','Todos os campos foram limpos','success');
     }
 
-    // Listen for services changes and update UI
+    function updateStats(services){
+      const total = services.length;
+      const active = services.filter(s=>s.active).length;
+      const inactive = total - active;
+      const avgPrice = total ? Math.round(services.reduce((sum,s)=>sum+s.price,0)/total) : 0;
+      totalServicesEl.textContent = total;
+      activeServicesEl.textContent = active;
+      inactiveServicesEl.textContent = inactive;
+      avgPriceEl.textContent = avgPrice.toLocaleString();
+    }
+
+    // Admin snapshot
     db.collection('services').orderBy('name').onSnapshot(snapshot => {
-      const container = document.getElementById('services');
-      const services = [];
-      
-      if (snapshot.empty) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-concierge-bell"></i>
-            <h3>Nenhum serviço cadastrado</h3>
-            <p>Adicione seu primeiro serviço usando o formulário acima</p>
-          </div>`;
-        updateStats([]);
-        return;
-      }
-      
-      container.innerHTML = '';
-      
-      snapshot.forEach(doc => {
+      const servicesArr = [];
+      dbContainer.innerHTML = snapshot.empty ? `<div class="empty-state"><i class="fas fa-concierge-bell"></i><p>Nenhum serviço cadastrado</p></div>` : '';
+
+      snapshot.forEach(doc=>{
         const s = doc.data();
-        services.push(s);
-        
-        const serviceElement = document.createElement('div');
-        serviceElement.className = 'service-item';
-        serviceElement.innerHTML = `
+        servicesArr.push(s);
+        const div = document.createElement('div');
+        div.className='service-item';
+        div.innerHTML = `
           <div class="service-info">
             <div class="service-name">${s.name}</div>
             <div class="service-price">${s.price.toLocaleString()} Kz</div>
             <div class="service-desc">${s.description || 'Sem descrição'}</div>
-            <div class="service-status ${s.active ? 'status-active' : 'status-inactive'}">
-              ${s.active ? 'Ativo' : 'Inativo'}
-            </div>
+            <div class="service-status ${s.active?'status-active':'status-inactive'}">${s.active?'Ativo':'Inativo'}</div>
           </div>
           <div class="service-actions">
-            <button class="btn btn-sm ${s.active ? 'btn-secondary' : 'btn-success'}" onclick="toggleService('${doc.id}', ${s.active})">
-              <i class="fas ${s.active ? 'fa-pause' : 'fa-play'}"></i> ${s.active ? 'Desativar' : 'Ativar'}
+            <button class="btn btn-sm ${s.active?'btn-secondary':'btn-success'}" onclick="toggleService('${doc.id}',${s.active})">
+              <i class="fas ${s.active?'fa-pause':'fa-play'}"></i> ${s.active?'Desativar':'Ativar'}
             </button>
             <button class="btn btn-sm btn-danger" onclick="deleteService('${doc.id}')">
               <i class="fas fa-trash"></i> Apagar
             </button>
           </div>`;
-        
-        container.appendChild(serviceElement);
+        dbContainer.appendChild(div);
       });
-      
-      updateStats(services);
+      updateStats(servicesArr);
     });
+  }
 
-    // Initialize with some sample stats (will be replaced by real data)
-    updateStats([]);
-  </script>
+  // -------------------- Funções Cliente --------------------
+  else {
+    const dbContainer = document.getElementById('services-container');
+
+    function requestService(name, price) {
+      const phone = "244923456789";
+      const message = `Olá! Gostaria de solicitar o serviço: ${name} (${price.toLocaleString()} Kz).`;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`,'_blank');
+    }
+
+    db.collection('services').where('active','==',true).orderBy('name').onSnapshot(snapshot=>{
+      if(!dbContainer) return;
+      if(snapshot.empty){
+        dbContainer.innerHTML = `<div class="empty-state"><i class="fas fa-concierge-bell"></i><p>Nenhum serviço disponível</p></div>`;
+        return;
+      }
+
+      dbContainer.innerHTML = snapshot.docs.map(doc=>{
+        const s = doc.data();
+        return `
+          <div class="service-card">
+            <div class="service-icon"><i class="${getServiceIcon(s.name)}"></i></div>
+            <div class="service-content">
+              <h3>${s.name}</h3>
+              <p>${s.description || 'Serviço profissional executado com qualidade.'}</p>
+              <div class="service-price">Kz ${s.price.toLocaleString()}</div>
+              <button onclick="requestService('${s.name}',${s.price})">Solicitar</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    });
+  }
+</script>
+
 </body>
 </html>
