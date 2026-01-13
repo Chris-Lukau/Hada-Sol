@@ -2,46 +2,654 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Login Admin</title>
+  <title>Login Admin | Hada‑Sol</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-blue: #1e3a8a;
+      --primary-orange: #f97316;
+      --secondary-blue: #3b82f6;
+      --secondary-orange: #fb923c;
+      --light-blue: #dbeafe;
+      --light-orange: #fed7aa;
+      --dark-blue: #1e40af;
+      --dark-orange: #ea580c;
+      --gradient-blue-orange: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-orange) 100%);
+      --gradient-orange-blue: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-blue) 100%);
+      --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--light-orange) 100%);
+      --text-dark: #1f2937;
+      --text-light: #f9fafb;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --error: #ef4444;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--gradient-blue-orange);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--text-dark);
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+      max-width: 1000px;
+      min-height: 600px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+      background: white;
+    }
+
+    /* Left side - Branding */
+    .branding-section {
+      flex: 1;
+      background: var(--gradient-blue-orange);
+      color: white;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .branding-section::before {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      top: -100px;
+      left: -100px;
+    }
+
+    .branding-section::after {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      bottom: -80px;
+      right: -80px;
+    }
+
+    .logo-container {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .logo-img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+    }
+
+    .brand-name {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .brand-subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+      max-width: 300px;
+      line-height: 1.5;
+    }
+
+    .brand-features {
+      margin-top: 40px;
+      text-align: left;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 1.2rem;
+    }
+
+    .feature-text {
+      font-size: 0.9rem;
+    }
+
+    /* Right side - Login form */
+    .login-section {
+      flex: 1;
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: white;
+    }
+
+    .login-header {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .login-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin-bottom: 10px;
+    }
+
+    .login-subtitle {
+      color: #6b7280;
+      font-size: 1rem;
+    }
+
+    .login-form {
+      width: 100%;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text-dark);
+      font-size: 0.95rem;
+    }
+
+    .input-with-icon {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary-blue);
+      font-size: 1.2rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 15px 15px 15px 50px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-orange);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+    }
+
+    .form-input::placeholder {
+      color: #9ca3af;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #6b7280;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      font-size: 0.9rem;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+    }
+
+    .checkbox {
+      margin-right: 8px;
+      accent-color: var(--primary-orange);
+    }
+
+    .forgot-password {
+      color: var(--primary-blue);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .forgot-password:hover {
+      color: var(--primary-orange);
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 15px;
+      background: var(--gradient-orange-blue);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Poppins', sans-serif;
+      box-shadow: 0 5px 15px rgba(249, 115, 22, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .login-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
+    }
+
+    .login-button:active {
+      transform: translateY(-1px);
+    }
+
+    .error-message {
+      color: var(--error);
+      font-size: 0.9rem;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .login-footer {
+      margin-top: 30px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+
+    .admin-note {
+      margin-top: 20px;
+      padding: 15px;
+      background: var(--gradient-light);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      border-left: 4px solid var(--primary-orange);
+    }
+
+    .admin-note strong {
+      color: var(--primary-blue);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        max-width: 450px;
+      }
+      
+      .branding-section {
+        padding: 30px 20px;
+      }
+      
+      .login-section {
+        padding: 40px 30px;
+      }
+      
+      .brand-name {
+        font-size: 1.8rem;
+      }
+      
+      .login-title {
+        font-size: 1.8rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .remember-forgot {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .brand-name {
+        font-size: 1.6rem;
+      }
+      
+      .login-title {
+        font-size: 1.6rem;
+      }
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-section {
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .branding-section {
+      animation: fadeIn 0.8s ease-out 0.2s both;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <!-- Left side - Branding section -->
+    <div class="branding-section">
+      <div class="logo-container">
+        <!-- Imagem da logo HADA-SOL -->
+        <img src="605534020_1291031323064961_5699633765163478233_n.png" alt="HADA-SOL Logo" class="logo-img">
+        <h1 class="brand-name">Hada‑Sol Admin</h1>
+        <p class="brand-subtitle">Painel administrativo para gestão de serviços e agendamentos</p>
+      </div>
+      
+      <div class="brand-features">
+        <div class="feature">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="feature-text">
+            <strong>Acesso Seguro</strong><br>
+            Autenticação protegida
+          </div>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">
+            <i class="fas fa-concierge-bell"></i>
+          </div>
+          <div class="feature-text">
+            <strong>Gestão de Serviços</strong><br>
+            Controle completo dos serviços
+          </div>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="feature-text">
+            <strong>Dashboard Intuitivo</strong><br>
+            Visualização de dados em tempo real
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right side - Login form -->
+    <div class="login-section">
+      <div class="login-header">
+        <h2 class="login-title">Login Administrativo</h2>
+        <p class="login-subtitle">Acesse o painel de controle com suas credenciais</p>
+      </div>
+      
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label class="form-label" for="email">E-mail</label>
+          <div class="input-with-icon">
+            <i class="fas fa-envelope input-icon"></i>
+            <input 
+              type="email" 
+              id="email" 
+              class="form-input" 
+              placeholder="admin@gmail.com" 
+              required
+              
+            >
+          </div>
+          <div class="error-message" id="emailError"></div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="password">Senha</label>
+          <div class="input-with-icon">
+            <i class="fas fa-lock input-icon"></i>
+            <input 
+              type="password" 
+              id="password" 
+              class="form-input" 
+              placeholder="••••••••••••••••" 
+              required
+              
+            >
+            <button type="button" class="password-toggle" id="togglePassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div class="error-message" id="passwordError"></div>
+        </div>
+        
+        <div class="remember-forgot">
+          <label class="remember-me">
+            <input type="checkbox" class="checkbox" checked>
+            Lembrar de mim
+          </label>
+          <a href="#" class="forgot-password">Esqueceu a senha?</a>
+        </div>
+        
+        <button type="submit" class="login-button" id="loginButton">
+          <i class="fas fa-sign-in-alt"></i>
+          Entrar no Painel
+        </button>
+        
+        <div class="error-message" id="loginError"></div>
+      </form>
+      
+      <div class="admin-note">
+        <strong>Nota:</strong> Este painel é restrito a administradores autorizados. 
+        Entre em contato com o suporte técnico em caso de problemas com o acesso.
+      </div>
+      
+      <div class="login-footer">
+        <p>&copy; 2023 Hada‑Sol. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </div>
 
-<form id="loginForm">
-  <input type="email" id="email" placeholder="admin@hada-sol.com" required>
-  <input type="password" id="password" placeholder="123456" required>
-  <button type="submit">Entrar</button>
-</form>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDYw4M_PV9H-44Tq88lMWtnSamTw2ZGw9Q",
+      authDomain: "hada-sol-admin.firebaseapp.com",
+      projectId: "hada-sol-admin",
+      appId: "1:538490730868:web:7c74dbf65c6a639aded421"
+    };
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDYw4M_PV9H-44Tq88lMWtnSamTw2ZGw9Q",
-    authDomain: "hada-sol-admin.firebaseapp.com",
-    projectId: "hada-sol-admin",
-    appId: "1:538490730868:web:7c74dbf65c6a639aded421"
-  };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+    // DOM Elements
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    const loginButton = document.getElementById('loginButton');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const loginError = document.getElementById('loginError');
 
-  document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+    // Toggle password visibility
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      
+      // Toggle eye icon
+      const icon = this.querySelector('i');
+      if (type === 'text') {
+        icon.className = 'fas fa-eye-slash';
+      } else {
+        icon.className = 'fas fa-eye';
+      }
+    });
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    // Form validation
+    function validateForm() {
+      let isValid = true;
+      
+      // Clear previous errors
+      emailError.style.display = 'none';
+      passwordError.style.display = 'none';
+      loginError.style.display = 'none';
+      
+      // Validate email
+      const email = emailInput.value.trim();
+      if (!email) {
+        emailError.textContent = 'Por favor, insira seu e-mail.';
+        emailError.style.display = 'block';
+        isValid = false;
+      } else if (!/\S+@\S+\.\S+/.test(email)) {
+        emailError.textContent = 'Por favor, insira um e-mail válido.';
+        emailError.style.display = 'block';
+        isValid = false;
+      }
+      
+      // Validate password
+      const password = passwordInput.value.trim();
+      if (!password) {
+        passwordError.textContent = 'Por favor, insira sua senha.';
+        passwordError.style.display = 'block';
+        isValid = false;
+      } else if (password.length < 6) {
+        passwordError.textContent = 'A senha deve ter no mínimo 20 caracteres.';
+        passwordError.style.display = 'block';
+        isValid = false;
+      }
+      
+      return isValid;
+    }
 
-    auth.signInWithEmailAndPassword(email, password)
-      .then(() => {
-        window.location.href = 'admin.html';
-      })
-      .catch(error => {
-        alert('Erro: ' + error.message);
-      });
-  });
-</script>
+    // Form submission
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!validateForm()) {
+        return;
+      }
+      
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+      
+      // Change button state
+      const originalText = loginButton.innerHTML;
+      loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+      loginButton.disabled = true;
+      
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          // Login successful
+          loginButton.innerHTML = '<i class="fas fa-check"></i> Login bem-sucedido!';
+          loginButton.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+          
+          // Redirect after a short delay
+          setTimeout(() => {
+            window.location.href = 'admin.html';
+          }, 1000);
+        })
+        .catch(error => {
+          // Login failed
+          loginButton.innerHTML = originalText;
+          loginButton.disabled = false;
+          
+          // Show error message based on error code
+          let errorMessage = 'Erro ao fazer login. Verifique suas credenciais.';
+          
+          if (error.code === 'auth/user-not-found') {
+            errorMessage = 'E-mail não encontrado.';
+          } else if (error.code === 'auth/wrong-password') {
+            errorMessage = 'Senha incorreta.';
+          } else if (error.code === 'auth/invalid-email') {
+            errorMessage = 'E-mail inválido.';
+          } else if (error.code === 'auth/too-many-requests') {
+            errorMessage = 'Muitas tentativas. Tente novamente mais tarde.';
+          }
+          
+          loginError.textContent = errorMessage;
+          loginError.style.display = 'block';
+          
+          // Shake animation for error
+          loginForm.style.animation = 'none';
+          setTimeout(() => {
+            loginForm.style.animation = 'shake 0.5s';
+          }, 10);
+          
+          // Remove animation after it completes
+          setTimeout(() => {
+            loginForm.style.animation = '';
+          }, 500);
+        });
+    });
 
+    // Add shake animation for errors
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Auto-focus on email field
+    emailInput.focus();
+    
+    // Demo credentials hint
+    <!--  -->
+  </script>
 </body>
 </html>
